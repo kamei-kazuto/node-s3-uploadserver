@@ -1,30 +1,20 @@
-const { readFileSync } = require('fs');
+const fs = require('fs');
 const { resolve } = require('path');
-const AWS = require('aws-sdk');
+const express = require('express');
+const multer  = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
-require('dotenv').config();
-const {
-  accessKeyId,
-  secretAccessKey,
-  region,
-  Bucket
-} = process.env
+const app = express();
 
-AWS.config.update({
-  accessKeyId,
-  secretAccessKey,
-  region
+app.post('/profile', upload.single('avatar'), (req, res, next) => {
+  console.log(req)
 })
 
-const s3 = new AWS.S3();
-const Body = readFileSync(resolve( process.cwd() ,'server', 'aaa.png'))
-const uploadInfo = {
-  Bucket,
-  Key: 'aaa/bbb.png',
-  Body
- };
-
-s3.putObject(uploadInfo, (err, data) => {
-  if (err) console.log(err, err.stack);
-  else     console.log(data);
+app.get('/', (req, res) => {
+  res.set('Content-Type', 'text/html');
+  const html = fs.readFileSync(resolve( __dirname, 'upload.html'))
+  console.log(html)
+  res.send(html);
 });
+
+app.listen(3000);
